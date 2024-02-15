@@ -15,6 +15,34 @@ export const HomeContainer = styled.main`
   }
 `
 
+const BaseInput = styled.input`
+  background-color: transparent;
+  height: 2.5rem;
+  border: 0;
+  border-bottom: 2px solid ${(props) => props.theme['gray-500']};
+  font-weight: bold;
+  font-size: 1.125rem;
+  flex-wrap: wrap;
+  padding: 0 0.5rem;
+  color: ${(props) => props.theme['gray-100']};
+
+  &:focus {
+    box-shadow: none;
+    border-color: ${(props) => props.theme['green-500']};
+  }
+
+  &::placeholder {
+    color: ${(props) => props.theme['gray-500']};
+  }
+`
+
+export const TasksInput = styled(BaseInput)`
+  flex: 1;
+`
+export const TaskInputAmount = styled(BaseInput)`
+  width: 4rem;
+`
+
 export const FormContainer = styled.div`
   width: 100%;
   display: flex;
@@ -49,4 +77,31 @@ export const Separator = styled.div`
   overflow: hidden;
   display: flex;
   justify-content: center;
+`
+
+export const StartCountDownButton = styled.button`
+  width: 100%;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+
+  background-color: ${(props) => props.theme['green-500']};
+  color: ${(props) => props.theme['gray-100']};
+
+  &:not(:disabled):hover {
+    background-color: ${(props) => props.theme['green-700']};
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 `
