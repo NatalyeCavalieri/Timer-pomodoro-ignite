@@ -11,6 +11,8 @@ import {
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
+import { useEffect, useState } from 'react'
+import { differenceInSeconds } from 'date-fns'
 
 const newCircleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'informe a tarefa'),
@@ -19,7 +21,29 @@ const newCircleFormValidationSchema = zod.object({
 
 type NewCircleFormData = zod.infer<typeof newCircleFormValidationSchema>
 
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+  startDate: Date
+}
+
 export function Home() {
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [amountSecondPassed, setAmountSecondPassed] = useState(0)
+
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate),
+        )
+      }, 1000)
+    }
+  }, [activeCycle])
+
   const { register, handleSubmit, watch, reset } = useForm<NewCircleFormData>({
     resolver: zodResolver(newCircleFormValidationSchema),
     defaultValues: {
@@ -29,9 +53,27 @@ export function Home() {
   })
 
   function handleCreateNewCircle(data: NewCircleFormData) {
-    console.log(data)
+    const id = String(new Date().getTime())
+
+    const newCycle: Cycle = {
+      id,
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    }
+    setCycles((state) => [...state, newCycle])
+    setActiveCycleId(id)
     reset()
   }
+
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondPassed : 0
+
+  const minutesAmount = Math.floor(totalSeconds / 60)
+  const secondsAmount = currentSeconds % 60
+
+  const minutes = String(minutesAmount).padStart(2, '0')
+  const seconds = String(secondsAmount).padStart(2, '0')
 
   const task = watch('task')
 
@@ -69,11 +111,11 @@ export function Home() {
           <span>minutos.</span>
         </FormContainer>
         <CountDownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span> {minutes[0]} </span>
+          <span> {minutes[1]} </span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span> {seconds[0]} </span>
+          <span> {seconds[1]} </span>
         </CountDownContainer>
         <StartCountDownButton type="submit" disabled={task === ''}>
           <Play size={24} />
